@@ -1,4 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { HttpForbiddenException } from '@gitroom/nestjs-libraries/services/exception.filter';
 import { Reflector } from '@nestjs/core';
 import {
   AppAbility,
@@ -42,7 +43,10 @@ export class PoliciesGuard implements CanActivate {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
-    const { org }: { org: Organization } = request;
+    const { org }: { org: Organization | undefined } = request;
+    if (!org) {
+      throw new HttpForbiddenException();
+    }
 
     const refreshChannelId = typeof request.query?.refresh === 'string' ? request.query.refresh : undefined;
 
